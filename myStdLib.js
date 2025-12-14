@@ -126,6 +126,23 @@ Element.prototype.newElement = function(type){
   return el;
 };
 
+// returns true if pointer is hovering Element
+Element.prototype.hasPointer = function(e){
+  const box = this.getBoundingClientRect();
+  
+  if(e.clientX >= box.left && e.clientX <= box.right && e.clientY >= box.top && e.clientY <= box.bottom){
+    return true;
+  }
+  return false;
+};
+
+// returns aspect ratio of Element
+Element.prototype.aspectRatio = function(){
+  let box = this.getBoundingClientRect();
+  
+  return box.width/box.height;
+};
+  
 // creates and returns new SVG Element and appends it to this group
 SVGGElement.prototype.newElement = function(type){
   let el = document.createElementNS("http://www.w3.org/2000/svg", type);
@@ -151,19 +168,12 @@ Array.prototype.max = function(){
   return Math.max.apply(null, this);
 };
 
-Element.prototype.hasPointer = function(e){
-  const box = this.getBoundingClientRect();
-  
-  if(e.clientX >= box.left && e.clientX <= box.right && e.clientY >= box.top && e.clientY <= box.bottom){
-    return true;
-  }
-  return false;
-};
-
+// returns parsed viewBox of SVG (numbers) as array [x,y,viewBoxWidth,viewBoxHeight]
 SVGSVGElement.prototype.getViewBox = function(){
-  return this.getAttribute("viewBox").split(" ").map((v) => parseInt(v,10));
+  return this.getAttribute("viewBox").split(" ").map((v) => parseFloat(v,10));
 };
 
+// sets SVG viewBox buy doesn't change value if it is null
 SVGSVGElement.prototype.setViewBox = function(x, y, vbx, vby){
   let newVB = this.getViewBox();
   
@@ -176,12 +186,14 @@ SVGSVGElement.prototype.setViewBox = function(x, y, vbx, vby){
   this.setAttribute("viewBox", newVB.join(" "));
 };
 
+// returns center of current SVG viewBox in SVG coordinates as array [x,y]
 SVGSVGElement.prototype.center = function(){
   let vb = this.getViewBox();
   
   return [vb[0]+vb[2]/2,vb[1]+vb[3]/2];
 };
 
+// fixes SVG viewBox if SVG is resized in width
 SVGSVGElement.prototype.resize = function(){
   let center = this.center();
   let vbx = this.getViewBox()[3]*this.aspectRatio();
@@ -189,8 +201,10 @@ SVGSVGElement.prototype.resize = function(){
   this.setViewBox(center[1]-0.5*vbx, null,null, null);
 };
 
-Element.prototype.aspectRatio = function(){
-  let box = this.getBoundingClientRect();
+// returns the SVG coordinates of pointer within SVG as array [x,y]
+SVGSVGElement.prototype.coord = function(e){
+  let vb = this.getViewBox();
+  let perc = this.perc(e);
   
-  return box.width/box.height;
+  return [vb[0]+vb[2]*perc[0], vb[1]+vb[3]*perc[1]];
 };
