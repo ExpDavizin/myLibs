@@ -12,6 +12,10 @@ function $$(selector){
 function $$$(selector){
   return document.querySelectorAll(selector);
 }
+// returns array with SVG group's children
+function children(group){
+  return [...group.children];
+}
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -147,3 +151,46 @@ Array.prototype.max = function(){
   return Math.max.apply(null, this);
 };
 
+Element.prototype.hasPointer = function(e){
+  const box = this.getBoundingClientRect();
+  
+  if(e.clientX >= box.left && e.clientX <= box.right && e.clientY >= box.top && e.clientY <= box.bottom){
+    return true;
+  }
+  return false;
+};
+
+SVGSVGElement.prototype.getViewBox = function(){
+  return this.getAttribute("viewBox").split(" ").map((v) => parseInt(v,10));
+};
+
+SVGSVGElement.prototype.setViewBox = function(x, y, vbx, vby){
+  let newVB = this.getViewBox();
+  
+  [...arguments].forEach((arg,i) => {
+    if(arg != null){
+      newVB[i] = arg;
+    }
+  });
+  
+  this.setAttribute("viewBox", newVB.join(" "));
+};
+
+SVGSVGElement.prototype.center = function(){
+  let vb = this.getViewBox();
+  
+  return [vb[0]+vb[2]/2,vb[1]+vb[3]/2];
+};
+
+SVGSVGElement.prototype.resize = function(){
+  let center = this.center();
+  let vbx = this.getViewBox()[3]*this.aspectRatio();
+  
+  this.setViewBox(center[1]-0.5*vbx, null,null, null);
+};
+
+Element.prototype.aspectRatio = function(){
+  let box = this.getBoundingClientRect();
+  
+  return box.width/box.height;
+};
