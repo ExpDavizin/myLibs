@@ -208,3 +208,7 @@ SVGSVGElement.prototype.coord = function(e){
   
   return [vb[0]+vb[2]*perc[0], vb[1]+vb[3]*perc[1]];
 };
+
+function test(){
+  console.log("Succes!");
+}
