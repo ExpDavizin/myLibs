@@ -28,6 +28,7 @@ function center(p1, p2){
   return {"x": (p1.x + p2.x)/2, "y": (p1.y + p2.y)/2};
 }
 
+
 /* Credits to: Web Dev Simplified */
 function debounce(cb, delay = 1000) {
   let timeout;
@@ -118,6 +119,52 @@ Element.prototype.newElement = function(type){
 	this.appendChild(el);
 
 	return el;
+};
+
+Element.prototype.fullyContains = function(){
+  let box1 = this.getBoundingClientRect();
+  let count = 0;
+  
+  [...arguments].forEach(el => {
+    let box2 = el.getBoundingClientRect();
+    
+    if(box2.top >= box1.top && box2.right <= box1.right && box2.bottom <= box1.bottom && box2.left >= box1.left){
+      count++;
+    }
+  });
+  
+  return count;
+};
+
+Element.prototype.containsCenter = function(){
+  let box1 = this.getBoundingClientRect();
+  let count = 0;
+  
+  [...arguments].forEach(el => {
+    let box2 = el.getBoundingClientRect();
+    let center = {"x": box2.left + box2.width/2, "y": box2.top + box2.height/2};
+    
+    if(center.y >= box1.top && center.x <= box1.right && center.y <= box1.bottom && center.x >= box1.left){
+      count++;
+    }
+  });
+  
+  return count;
+};
+
+Element.prototype.intersects = function(){
+  let box1 = this.getBoundingClientRect();
+  let count = 0;
+  
+  [...arguments].forEach(el => {
+    let box2 = el.getBoundingClientRect();
+    
+    if(box2.top <= box1.bottom && box2.right >= box1.left && box2.bottom >= box1.top && box2.left <= box1.right){
+      count++;
+    }
+  });
+  
+  return count;
 };
 
 
