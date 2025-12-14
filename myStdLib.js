@@ -1,18 +1,18 @@
-// equivalent to document.getElementById()
+/* equivalent to document.getElementById() */
 function $(id){
   return document.getElementById(id);
 }
 
-// equivalent to document.querySelector()
+/* equivalent to document.querySelector() */
 function $$(selector){
   return document.querySelector(selector);
 }
 
-// equivalent to document.querySelectorAll()
+/* equivalent to document.querySelectorAll() */
 function $$$(selector){
   return document.querySelectorAll(selector);
 }
-// returns array with SVG group's children
+/* returns array with SVG group's children */
 function children(group){
   return [...group.children];
 }
@@ -21,8 +21,8 @@ function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
 }
 
-// changes multiple CSS variables within :root{}
-// args => ("variable1", "value1", "variable2", "value2", ...)
+/* changes multiple CSS variables within :root{} */
+/* args => ("variable1", "value1", "variable2", "value2", ...) */
 function root(){
   if(arguments.length % 2 != 0){
     console.error(`Missig variable/value in root().`);
@@ -32,17 +32,17 @@ function root(){
   }
 }
 
-// returns distance betheen two coordinates [x, y] (no units specified)
+/* returns distance betheen two coordinates [x, y] (no units specified) */
 function dist(C1, C2){
   return Math.sqrt((C2[0] - C1[0])**2 + (C2[1] - C1[1])**2);
 }
 
-// returns medium coordinate between two coordinates [x, y] (no units specified)
+/* returns medium coordinate between two coordinates [x, y] (no units specified) */
 function center(C1, C2){
   return [(C1[0] + C2[0])/2, (C1[1] + C2[1])/2];
 }
 
-// Credits to: Web Dev Simplified
+/* Credits to: Web Dev Simplified */
 function debounce(cb, delay = 1000) {
   let timeout;
 
@@ -54,7 +54,7 @@ function debounce(cb, delay = 1000) {
   };
 }
 
-// Credits to: Web Dev Simplified
+/* Credits to: Web Dev Simplified */
 function throttle(cb, delay = 1000) {
   let shouldWait = false;
   let waitingArgs;
@@ -81,8 +81,8 @@ function throttle(cb, delay = 1000) {
   };
 }
 
-// returns pointer position (in HTMP pixels) within Element with [0,0] beeing top left corner and [this.width,this.height] the bottom right
-// dependencies: clamp()
+/* returns pointer position (in HTMP pixels) within Element with [0,0] beeing top left corner and [this.width,this.height] the bottom right */
+/* dependencies: clamp() */
 Element.prototype.pos = function(e){
     let box = this.getBoundingClientRect();
     
@@ -92,8 +92,8 @@ Element.prototype.pos = function(e){
     return [x,y];
 };
 
-// returns pointer position percentage within Element with [0,0] beeing top the left corner and [1,1] the bottom right
-// dependencies: clamp(), pos()
+/* returns pointer position percentage within Element with [0,0] beeing top the left corner and [1,1] the bottom right */
+/* dependencies: clamp(), pos() */
 Element.prototype.perc = function(e){
     let pos = this.pos(e);
     let box = this.getBoundingClientRect();
@@ -104,9 +104,9 @@ Element.prototype.perc = function(e){
     return [px,py];
 };
 
-// equivalent to .setAttribute() but accepts multiple arguments
-// args => ("attibute1", "value1", "attibute2", "value2", ...)
-// returns this Element
+/* equivalent to .setAttribute() but accepts multiple arguments */
+/* args => ("attibute1", "value1", "attibute2", "value2", ...) */
+/* returns this Element */
 Element.prototype.attrs = function(){
   if(arguments.length % 2 != 0){
     console.error(`Missig argument/value in .attrs().`);
@@ -118,7 +118,7 @@ Element.prototype.attrs = function(){
   return this;
 };
 
-// creates and returns new Element and appends it to this Element/tag
+/* creates and returns new Element and appends it to this Element/tag */
 Element.prototype.newElement = function(type){
   let el = document.createElement(type);
   this.appendChild(el);
@@ -126,7 +126,7 @@ Element.prototype.newElement = function(type){
   return el;
 };
 
-// returns true if pointer is hovering Element
+/* returns true if pointer is hovering Element */
 Element.prototype.hasPointer = function(e){
   const box = this.getBoundingClientRect();
   
@@ -136,14 +136,14 @@ Element.prototype.hasPointer = function(e){
   return false;
 };
 
-// returns aspect ratio of Element
+/* returns aspect ratio of Element */
 Element.prototype.aspectRatio = function(){
   let box = this.getBoundingClientRect();
   
   return box.width/box.height;
 };
   
-// creates and returns new SVG Element and appends it to this group
+/* creates and returns new SVG Element and appends it to this group */
 SVGGElement.prototype.newElement = function(type){
   let el = document.createElementNS("http://www.w3.org/2000/svg", type);
   this.appendChild(el);
@@ -151,7 +151,7 @@ SVGGElement.prototype.newElement = function(type){
   return el;
 };
 
-// creates and returns new SVG Text and appends it to this Element
+/* creates and returns new SVG Text and appends it to this Element */
 SVGGElement.prototype.newText = function(label){
   let txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
   txt.textContent = label;
@@ -168,12 +168,12 @@ Array.prototype.max = function(){
   return Math.max.apply(null, this);
 };
 
-// returns parsed viewBox of SVG (numbers) as array [x,y,viewBoxWidth,viewBoxHeight]
+/* returns parsed viewBox of SVG (numbers) as array [x,y,viewBoxWidth,viewBoxHeight] */
 SVGSVGElement.prototype.getViewBox = function(){
   return this.getAttribute("viewBox").split(" ").map((v) => parseFloat(v,10));
 };
 
-// sets SVG viewBox buy doesn't change value if it is null
+/* sets SVG viewBox buy doesn't change value if it is null */
 SVGSVGElement.prototype.setViewBox = function(x, y, vbx, vby){
   let newVB = this.getViewBox();
   
@@ -186,14 +186,14 @@ SVGSVGElement.prototype.setViewBox = function(x, y, vbx, vby){
   this.setAttribute("viewBox", newVB.join(" "));
 };
 
-// returns center of current SVG viewBox in SVG coordinates as array [x,y]
+/* returns center of current SVG viewBox in SVG coordinates as array [x,y] */
 SVGSVGElement.prototype.center = function(){
   let vb = this.getViewBox();
   
   return [vb[0]+vb[2]/2,vb[1]+vb[3]/2];
 };
 
-// fixes SVG viewBox if SVG is resized in width
+/* fixes SVG viewBox if SVG is resized in width */
 SVGSVGElement.prototype.resize = function(){
   let center = this.center();
   let vbx = this.getViewBox()[3]*this.aspectRatio();
@@ -201,7 +201,7 @@ SVGSVGElement.prototype.resize = function(){
   this.setViewBox(center[1]-0.5*vbx, null,null, null);
 };
 
-// returns the SVG coordinates of pointer within SVG as array [x,y]
+/* returns the SVG coordinates of pointer within SVG as array [x,y] */
 SVGSVGElement.prototype.coord = function(e){
   let vb = this.getViewBox();
   let perc = this.perc(e);
