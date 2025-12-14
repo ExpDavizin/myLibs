@@ -169,7 +169,7 @@ Array.prototype.max = function(){
 };
 
 /* returns the SVG coordinates of pointer within SVG as array [x,y] */
-SVGSVGElement.prototype.coord = function(e){
+SVGSVGElement.prototype.svgpos = function(e){
   let vb = this.getViewBox();
   let perc = this.perc(e);
   
