@@ -1,27 +1,13 @@
-SVGPathElement.prototype.parseLine = function(){
-  let parse = this.getAttribute("d").split(" ");
-  let result = [];
+SVGSVGElement.prototype.startValues = function(world){
+  let vb = this.getViewBox();
   
-  parse.forEach(point => {
-    if(point != "Z"){
-      let split = point.substring(1).split(",");
-      result.push([parseFloat(split[0]), parseFloat(split[1])]);
-    }
-  });
+  if(this.aspectRatio() > 1){
+    this.setViewBox({"vbW": world.sizeX, "vbH": world.sizeX/this.aspectRatio()});
+  }
+  else{
+    this.setViewBox({"vbW": world.sizeY*this.aspectRatio(), "vbH": world.sizeY});
+  }
   
-  return result;
-};
-
-Array.prototype.deparseLine = function(){
-  let result = [];
-  this.forEach((point, i) => {
-    if(i === 0){
-      result.push(`M${point[0]},${point[1]}`);
-    }
-    else{
-      result.push(`L${point[0]},${point[1]}`);
-    }
-  });
-  
-  return result.join(" ");
+  vb = this.getViewBox();
+  this.setViewBox("vbX": world.center.x - vb.vbW/2, "vbY": world.center.y - vb.vbH/2);
 };
