@@ -77,6 +77,20 @@ Array.prototype.max = function(){
 	return Math.max.apply(null, this);
 };
 
+Array.prototype.deparseLine = function(){
+  let result = [];
+  this.forEach((point, i) => {
+    if(i === 0){
+      result.push(`M${point.x},${point.y}`);
+    }
+    else{
+      result.push(`L${point.x},${point.y}`);
+    }
+  });
+  
+  return result.join(" ");
+};
+
 
 Element.prototype.attrs = function(object){
 	Object.keys(object).forEach(att => {
@@ -185,6 +199,21 @@ SVGGElement.prototype.newText = function(label){
 
 SVGGElement.prototype.asArray = function(){
   return [...this.children];
+};
+
+
+SVGPathElement.prototype.parseLine = function(){
+  let parse = this.getAttribute("d").split(" ");
+  let result = [];
+  
+  parse.forEach((point, i) => {
+    if(point != "Z"){
+      let split = point.substring(1).split(",");
+      result.push({"x":parseFloat(split[0]), "y": parseFloat(split[1]), "pathEl": this, "index": i});
+    }
+  });
+  
+  return result;
 };
 
 
