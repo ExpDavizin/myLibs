@@ -9,5 +9,5 @@ SVGSVGElement.prototype.startValues = function(world){
   }
   
   vb = this.getViewBox();
-  this.setViewBox("vbX": world.center.x - vb.vbW/2, "vbY": world.center.y - vb.vbH/2);
+  this.setViewBox({"vbX": world.center.x - vb.vbW/2, "vbY": world.center.y - vb.vbH/2});
 };
