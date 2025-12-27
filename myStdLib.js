@@ -37,7 +37,7 @@ function client(x,y) {
 }
 
 function time(ms) {
-	const yearsFloat = ms/(100*60*60*24*30*12),
+	const yearsFloat = ms/(1000*60*60*24*30*12),
 		  years = Math.floor(yearsFloat);
 		  monthsFloat = Math.decimal(yearsFloat)*12;
 		  months = Math.floor(monthsFloat);
