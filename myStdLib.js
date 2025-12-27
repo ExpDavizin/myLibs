@@ -21,10 +21,7 @@ function clamp(value, min, max) {
 }
 
 function interval(val, limit1, limit2) {
-	if(val === clamp(Math.min(limit1,limit2), val, Math.max(limit1,limit2))) {
-		return true;
-	}
-	return false;
+	return val === clamp(Math.min(limit1,limit2), val, Math.max(limit1,limit2));
 }
 
 function dist(p1, p2 = {"x":0,"y":0}) {
