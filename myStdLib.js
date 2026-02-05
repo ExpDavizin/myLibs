@@ -154,7 +154,7 @@ Object.defineProperties((Array.prototype),{
 	    this.forEach((e,i) => {
 	      this[i] = isNaN(e) ? e : parseFloat(e)*factor;
 	    });
-	    return scale;
+	    return factor;
 	  }
 	}
 });
