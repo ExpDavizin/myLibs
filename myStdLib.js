@@ -43,7 +43,7 @@ function throttle(cb, delay = 1000) {
 		setTimeout(timeoutFunc, delay);
 	};
 }
-/* End or credits */
+/* End of credits */
 
 Object.defineProperties((Function.prototype),{
   "wrap": {
