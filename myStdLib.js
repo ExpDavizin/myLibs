@@ -1,52 +1,9 @@
-function $(id) {
-	return document.getElementById(id);
-}
-
-function $$(selector) {
+function $(selector) {
 	return document.querySelector(selector);
 }
 
-function $$$(selector) {
+function $$(selector) {
 	return document.querySelectorAll(selector);
-}
-
-function root(object) {
-	Object.keys(object).forEach(att => {
-		document.documentElement.style.setProperty(att, object[att]);
-	});
-}
-
-function clamp(value, min, max) {
-	return Math.min(Math.max(value, min), max);
-}
-
-function interval(val, limit1, limit2) {
-	return val === clamp(Math.min(limit1,limit2), val, Math.max(limit1,limit2));
-}
-
-function dist(p1, p2 = {"x":0,"y":0}) {
-	return Math.sqrt((p2.x - p1.x)**2 + (p2.y - p1.y)**2);
-}
-
-function center(p1, p2) {
-	return {"x": (p1.x + p2.x)/2, "y": (p1.y + p2.y)/2};
-}
-
-function client(x,y) {
-	return {"clientX": x, "clientY": y};
-}
-
-function time(ms) {
-	const yearsFloat = ms/(1000*60*60*24*30*12),
-		  years = Math.floor(yearsFloat),
-		  monthsFloat = Math.decimal(yearsFloat)*12,
-		  months = Math.floor(monthsFloat),
-		  daysFloat = Math.decimal(monthsFloat)*30,
-		  days = Math.floor(daysFloat),
-		  hoursFloat = Math.decimal(daysFloat)*24,
-		  hours = Math.floor(hoursFloat);
-	
-	return [years, months, days, hours];
 }
 
 /* Credits to: Web Dev Simplified */
@@ -61,7 +18,6 @@ function debounce(cb, delay = 1000) {
 	};
 }
 
-/* Credits to: Web Dev Simplified */
 function throttle(cb, delay = 1000) {
 	let shouldWait = false;
 	let waitingArgs;
@@ -87,242 +43,367 @@ function throttle(cb, delay = 1000) {
 		setTimeout(timeoutFunc, delay);
 	};
 }
+/* End or credits */
 
-function lineInterc(p1,p2,q1,q2) {
-	const a1 = (p2.y - p1.y)/(p2.x - p1.x);
-	const a2 = (q2.y - q1.y)/(q2.x - q1.x);
-	const b1 = p1.y - a1*p1.x;
-	const b2 = q1.y - a2*q1.x;
+Object.defineProperties((Function.prototype),{
+  "wrap": {
+    value: function (args) {
+      return (args.length === 1 && Array.isArray(args)) ? args[0] : args;
+    }
+  }
+});
 
-	if(a1 != a2) {
-		if(Math.abs(a1 + a2) != Infinity) {
-			const x = (b2 - b1)/(a1 - a2);
-			if(interval(x,p1.x,p2.x) && interval(x,q1.x,q2.x)) {
-				return true;
-			}
-		}
-		else {
-			if(Math.abs(a1) > Math.abs(a2)) {
-				if(interval(p1.x,q1.x,q2.x) && interval(a2*q1.x+b2,p1.y,p2.y)) {
-					return true;
-				}
-			}
-			else {
-				if(interval(q1.x,p1.x,p2.x) && interval(a1*p1.x+b1,q1.y,q2.y)) {
-					return true;
-				}
-			}
-		}
+const Root = document.documentElement.style;
+Object.defineProperties((Root),{
+  "setProperties": {
+    value: function () {
+      if(arguments.length%2){
+        console.warn("Missing values.");
+        return;
+      }
+      for(let i = 0;i <= Math.ceil(arguments.length/2);i++){
+        this.setProperty(arguments[2*i],arguments[2*i + 1]);
+      }
+    }
+  }
+});
+
+Object.defineProperties((Math),{
+  "clamp": {
+    value: function (x, min, max) {
+    	return Math.min(Math.max(x,min),max);
+    }
+  },
+  "between": {
+    value: function (x, num1, num2) {
+      return x >= Math.min(num1,num2) && x <= Math.max(num1,num2);
+    }
+  }
+});
+
+Object.defineProperties((Array.prototype),{
+  "min": {
+    get: function () {
+      return Math.min.apply(null,this);
+    }
+  },
+  "max": {
+    get: function () {
+      return Math.max.apply(null,this);
+    }
+  },
+  "last": {
+    get: function () {return this[this.length - 1]},
+    set: function (newValue) {this[this.length - 1] = newValue}
+  },
+  "remove": {
+    value: function (index) {
+      return this.splice(index,1);
+    }
+  },
+  "insert": {
+    value: function (index, newValue) {
+      this.splice(index,0,newValue);
+      return newValue;
+    }
+  },
+  "x": {
+    get: function () {
+      return this[0] ? this[0] : 0;
+		},
+		set: function (newValue) {
+      this[0] = newValue;
+      return newValue;
+    }
+	},
+	"y": {
+    get: function () {
+      return this[1] ? this[1] : 0;
+		},
+		set: function (newValue) {
+      this[1] = newValue;
+      return newValue;
+    }
+	},
+	"z": {
+    get: function () {
+      return this[2] ? this[2] : 0;
+		},
+		set: function (newValue) {
+      this[2] = newValue;
+      return newValue;
+    }
+	},
+	"norm": {
+	  get: function () {
+      return Math.sqrt(this.reduce((acc,cur) => {
+  			return isNaN(cur) ? acc : acc + Math.pow(parseFloat(cur),2);
+  		}, 0));
+	  }
+	},
+	"versor": {
+	  get: function () {
+	    return this.norm === 0 ? null : this.map(e => isNaN(e) ? e : parseFloat(e)/this.norm);
+	  }
+	},
+	"scale": {
+	  value: function (factor,apply = 0) {
+	    if(!apply){
+	      return this.map(e => isNaN(e) ? e : parseFloat(e)*factor);
+	    }
+	    this.forEach((e,i) => {
+	      this[i] = isNaN(e) ? e : parseFloat(e)*factor;
+	    });
+	    return scale;
+	  }
 	}
-	return false;
+});
+
+Object.defineProperties((DOMRect.prototype),{
+  "ratio": {
+    get: function () {
+      return this.width/this.height;
+    }
+  },
+  "relativeX": {
+    value: function (e) {
+      return e.x - this.x;
+    }
+  },
+  "relativeY": {
+    value: function (e) {
+      return e.y - this.y;
+    }
+  },
+  "percentX": {
+    value: function (e) {
+      return this.relativeX(e)/this.width;
+    }
+  },
+  "percentY" : {
+    value: function (e) {
+      return this.relativeY(e)/this.height;
+    }
+  }
+});
+
+Object.defineProperties((Element.prototype),{
+  "rect": {
+    value: Element.prototype.getBoundingClientRect
+  },
+  "setAttributes": {
+    value: function () {
+      [...arguments].forEach((a,i) => {
+        // if(a instanceof NamedNodeMap){
+        //   a = [...a];
+        // }
+        if(!(a instanceof Array)){
+          return;
+        }
+        // if(a.length % 2){
+        //   return;
+        // }
+        for(let i = 0;i <= a.length/2;i++){
+          this.setAttribute(a[2*i],a[2*i+1]);
+        }
+      });
+    }
+  },
+  "new": {
+    value: function (type) {
+    	console.log(this.prototype);
+    	this.appendChild(document.createElement(type));
+    	return this.lastElementChild;
+    }
+  }
+});
+
+Object.defineProperties((SVGSVGElement.prototype),{
+  "new": {
+    value: function (type) {
+    	this.appendChild(document.createElementNS("http://www.w3.org/2000/svg",type));
+    	return this.lastElementChild;
+    }
+  },
+  "centerX": {
+    get: function () {
+      return this.viewBox.baseVal.x + this.viewBox.baseVal.width/2;
+    }
+  },
+  "centerY": {
+    get: function () {
+      return this.viewBox.baseVal.y + this.viewBox.baseVal.height/2;
+    }
+  },
+  "positionX": {
+    value: function (e) {
+      return this.viewBox.baseVal.x + this.rect().percentX(e)*this.viewBox.baseVal.width;
+    }
+  },
+  "positionY": {
+    value: function (e) {
+      return this.viewBox.baseVal.y + this.rect().percentY(e)*this.viewBox.baseVal.height;
+    }
+  },
+  "resizeX": {
+    value: function () {
+      this.attributes.viewBox.baseVal = `${this.centerX - this.viewBox.baseVal.height*this.rect().ratio/2} ${this.viewBox.baseVal.y} ${this.viewBox.baseVal.width} ${this.viewBox.baseVal.height}`;
+    }
+  },
+  "resizeY": {
+    value: function () {
+      this.attributes.viewBox.baseVal = `${this.viewBox.baseVal.x} ${this.centerY - this.viewBox.baseVal.width/this.rect().ratio/2} ${this.viewBox.baseVal.width} ${this.viewBox.baseVal.height}`;
+    }
+  }
+});
+
+Object.defineProperties((SVGGElement.prototype),{
+  "new": {
+    value: function (type) {
+    	this.appendChild(document.createElementNS("http://www.w3.org/2000/svg",type));
+    	return this.lastElementChild;
+    }
+  }
+});
+
+Object.defineProperties((SVGPathElement.prototype),{
+  "d": {
+    get: function () {return this.attributes.d.value},
+    set: function (newValue) {this.attributes.d.value = newValue}
+  },
+  "length": {
+    get: function () {return this.commands.length}
+  },
+  "commands": {
+    get: function () {
+      return this.d.split(" ");
+    }
+  },
+  "setCommand": {
+    value: function (index,newValue) {
+      this.d = this.d.split(" ").map((e,i) => i === index ? newValue : e).join(" ");
+    }
+  },
+  "delete": {
+    value: function (index) {
+      this.d = this.commands.splice(index,1).join(" ");
+      return this.d;
+    }
+  },
+  "pop": {
+    value: function (){
+      this.d = this.command.pop().join(" ");
+      return this.d;
+    }
+  },
+  "push": {
+    value: function (val) {
+      this.d = this.d+" "+val;
+      return this.d;
+    }
+  },
+  "insert": {
+    value: function (index,val) {
+      this.d = this.commands.insert(index,val).join(" ");
+      return this.d;
+    }
+  },
+  "parse": {
+    get: function () {
+      function asCoord(string){
+        return string.slice(1).split(",").map(n => Number(n));
+      }
+      
+      const verticesBuffer = [], midsBuffer = [];
+      this.commands.forEach((s,i) => {
+        switch(s[0]){
+          case 'M':
+            verticesBuffer.push([]);      
+          case 'L':
+            verticesBuffer.last.push({"value":asCoord(s),"ownerElement":this,"index":i});
+            break;
+          case 'Z':
+            verticesBuffer.last.push(verticesBuffer.last[0]);
+            break;
+          default:
+            break;
+        }
+      });
+      
+      verticesBuffer.forEach(array => {
+        for(let i = 0;i < array.length - 1;i++){
+          midsBuffer.push({"value":[(array[i].value[0] + array[i+1].value[0])/2,(array[i].value[1] + array[i+1].value[1])/2],"ownerElement":this,"index":i});
+        }
+      });
+      
+      return [verticesBuffer,midsBuffer];
+    }
+  },
+  "continuous": {
+    get: function (){
+      return this.d.match(/[Mm]/g).length === 1;
+    }
+  },
+  "split": {
+    value: function (){
+      // if(this.continuous){
+      //   return;
+      // }
+      
+      for(let i = 1;i < this.d.split("M").length;i++){
+        this.parentElement.new("path").setAttributes(['d',`M${this.d.split("M")[i]}`]);
+      }
+      
+      this.remove();
+    }
+  }
+});
+
+class Vector {
+  static dim (...args) {
+    return Function.wrap(args).reduce((acc,cur) => {
+			return Math.max(acc,cur.length);
+		},0);
+  }
+  
+  static add (...args) {
+    const buffer = [];
+    Function.wrap(args).forEach((v) => v.forEach((e,i) => {
+      if(buffer[i]){
+        buffer[i] += isNaN(e) ? e : parseFloat(e);
+      }
+      else{
+        buffer[i] = isNaN(e) ? e : parseFloat(e);
+      }
+    }));
+    return buffer;
+  }
+  
+  static dist (v1, v2) {
+    return Vector.add(v1,v2.scale(-1)).norm;
+  }
+  
+  static dot (v1, v2) {
+    let buffer = 0;
+    for(let i = 0; i < Vector.dim(v1, v2); i++){
+      buffer += (v1[i] ? v1[i] : 0) * (v2[i] ? v2[i] : 0);
+    }
+    return buffer;
+  }
+  
+  static vec (v1, v2) {
+    return [v1.y*v2.z - v1.z*v2.y, v1.z*v2.x - v1.x*v2.z, v1.x*v2.y - v1.y*v2.x];
+  }
+  
+  static cos (v1, v2) {
+    return Vector.dot(v1, v2)/(v1.norm*v2.norm);
+  }
+  
+  static ang (v1, v2) {
+    return Math.acos(Vector.cos(v1, v2));
+  }
+  
+  static proj (v1, v2) {
+    return v2.scale(Vector.dot(v1, v2)/Vector.dot(v2, v2));
+  }
 }
-
-
-Math.decimal = function(num) {
-	return num - Math.floor(num);
-	// return parseFloat("0."+`${num}`.split(".")[1]);
-}
-
-
-Array.prototype.min = function() {
-	return Math.min.apply(null, this);
-};
-
-Array.prototype.max = function() {
-	return Math.max.apply(null, this);
-};
-
-Array.prototype.deparseLine = function() {
-	let result = [];
-	this.forEach((point, i) => {
-		if(i === 0) {
-			result.push(`M${point.x},${point.y}`);
-		}
-		else {
-			result.push(`L${point.x},${point.y}`);
-		}
-	});
-
-	return result.join(" ");
-};
-
-
-Element.prototype.rect = Element.prototype.getBoundingClientRect;
-
-Element.prototype.attrs = function(object) {
-	Object.keys(object).forEach(att => {
-		this.setAttribute(att, object[att]);
-	});
-
-	return this;
-};
-
-Element.prototype.hasPointer = function(e, margin = 0) {
-	let box = this.rect();
-	if(e.clientX >= box.left-margin && e.clientX <= box.right+margin && e.clientY >= box.top-margin && e.clientY <= box.bottom+margin) {
-		return true;
-	}
-	return false;
-};
-
-Element.prototype.aspectRatio = function() {
-	let box = this.rect();
-
-	return box.width/box.height;
-};
-
-Element.prototype.pos = function(e) {
-	let box = this.rect();
-
-	return {"x": clamp(0, e.clientX - box.left, box.width), "y": clamp(0, e.clientY - box.top, box.height)};
-};
-
-Element.prototype.perc = function(e) {
-	let pos = this.pos(e);
-	let box = this.rect();
-
-	return {"x": clamp(0, pos.x/box.width, 1), "y": clamp(0, pos.y/box.height, 1)};
-};
-
-Element.prototype.newElement = function(type) {
-	let el = document.createElement(type);
-	this.appendChild(el);
-
-	return el;
-};
-
-Element.prototype.fullyContains = function() {
-	let box1 = this.rect();
-	let count = 0;
-
-	[...arguments].forEach(el => {
-		let box2 = el.rect();
-
-		if(box2.top >= box1.top && box2.right <= box1.right && box2.bottom <= box1.bottom && box2.left >= box1.left) {
-			count++;
-		}
-	});
-
-	return count;
-};
-
-Element.prototype.containsCenter = function() {
-	let box1 = this.rect();
-	let count = 0;
-
-	[...arguments].forEach(el => {
-		let box2 = el.rect();
-		let center = {"x": box2.left + box2.width/2, "y": box2.top + box2.height/2};
-
-		if(center.y >= box1.top && center.x <= box1.right && center.y <= box1.bottom && center.x >= box1.left) {
-			count++;
-		}
-	});
-
-	return count;
-};
-
-Element.prototype.intersects = function() {
-	let box1 = this.rect();
-	let count = 0;
-
-	[...arguments].forEach(el => {
-		let box2 = el.rect();
-
-		if(box2.top <= box1.bottom && box2.right >= box1.left && box2.bottom >= box1.top && box2.left <= box1.right) {
-			count++;
-		}
-	});
-
-	return count;
-};
-
-
-SVGPathElement.prototype.parseLine = function() {
-	let parse = this.getAttribute("d").split(" ");
-	let result = [];
-
-	parse.forEach((point, i) => {
-		if(point != "Z") {
-			let split = point.substring(1).split(",");
-			result.push({"x":parseFloat(split[0]), "y": parseFloat(split[1]), "path": this, "index": i});
-		}
-	});
-
-	return result;
-};
-
-
-SVGGElement.prototype.newElement = function(type) {
-	let el = document.createElementNS("http://www.w3.org/2000/svg", type);
-	this.appendChild(el);
-
-	return el;
-};
-
-SVGGElement.prototype.newText = function(label) {
-	let txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
-	txt.textContent = label;
-	this.appendChild(txt);
-
-	return txt;
-};
-
-SVGGElement.prototype.asArray = function() {
-	return [...this.children];
-};
-
-
-SVGSVGElement.prototype.getViewBox = function() {
-	let array = this.getAttribute("viewBox").split(" ").map((v) => parseFloat(v,10));
-
-	return {"vbX": array[0], "vbY": array[1], "vbW": array[2], "vbH": array[3]};
-};
-
-SVGSVGElement.prototype.setViewBox = function(object) {
-	let vb = this.getViewBox();
-
-	Object.keys(object).forEach(key => {
-		vb[key] = object[key];
-	});
-
-	this.setAttribute("viewBox", `${vb.vbX} ${vb.vbY} ${vb.vbW} ${vb.vbH}`);
-};
-
-SVGSVGElement.prototype.center = function() {
-	let vb = this.getViewBox();
-
-	return {"x": vb.vbX + vb.vbW/2, "y": vb.vbY + vb.vbH/2};
-};
-
-SVGSVGElement.prototype.coord = function(e) {
-	let vb = this.getViewBox();
-	let perc = this.perc(e);
-
-	return {"x": Math.trunc(vb.vbX + vb.vbW*perc.x)+0.5, "y": Math.trunc(vb.vbY + vb.vbH*perc.y)+0.5};
-};
-
-SVGSVGElement.prototype.pointPerc = function(point) {
-	let vb = this.getViewBox();
-
-	return {"x": (point.x - vb.vbX)/vb.vbW, "y": (point.y - vb.vbY)/vb.vbH};
-};
-
-SVGSVGElement.prototype.pointPos = function(point) {
-	const vb = this.getViewBox();
-	const rect = map.rect();
-
-	return {"x": map.pointPerc(point).x*rect.width, "y": map.pointPerc(point).y*rect.height};
-};
-
-SVGSVGElement.prototype.resizeX = function() {
-	let vb = this.getViewBox();
-
-	this.setViewBox({"vbX": this.center().x - vb.vbH*this.aspectRatio()/2});
-};
-
-SVGSVGElement.prototype.resizeY = function() {
-	let vb = this.getViewBox();
-
-	this.setViewBox({"vbY": this.center().y - vb.vbW/this.aspectRatio()/2});
-};
