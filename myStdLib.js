@@ -45,6 +45,10 @@ function throttle(cb, delay = 1000) {
 }
 /* End of credits */
 
+async function openJSONFile(link){
+	return await(await fetch(link)).json();
+}
+
 Object.defineProperties((Function.prototype),{
   "wrap": {
     value: function (args) {
