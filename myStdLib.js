@@ -50,7 +50,7 @@ async function openJSONFile(link){
 }
 
 Object.defineProperties((window),{
-	"aspectRatio": {
+	"ratio": {
 		"get": function () {
 			return this.innerWidth/this.innerHeight;
 		}
@@ -204,26 +204,14 @@ Object.defineProperties((Element.prototype),{
     value: Element.prototype.getBoundingClientRect
   },
   "setAttributes": {
-    value: function () {
-      [...arguments].forEach((a,i) => {
-        // if(a instanceof NamedNodeMap){
-        //   a = [...a];
-        // }
-        if(!(a instanceof Array)){
-          return;
-        }
-        // if(a.length % 2){
-        //   return;
-        // }
-        for(let i = 0;i <= a.length/2;i++){
-          this.setAttribute(a[2*i],a[2*i+1]);
-        }
-      });
-    }
+    value: function (obj) {
+		Object.keys(obj).forEach(key => {
+			this.setAttribute(key, obj[key]);
+		});
+	}
   },
   "new": {
     value: function (type) {
-    	console.log(this.prototype);
     	this.appendChild(document.createElement(type));
     	return this.lastElementChild;
     }
