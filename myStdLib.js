@@ -208,6 +208,7 @@ Object.defineProperties((Element.prototype),{
 		Object.keys(obj).forEach(key => {
 			this.setAttribute(key, obj[key]);
 		});
+		return this;
 	}
   },
   "new": {
@@ -365,6 +366,16 @@ class Vector {
 			return Math.max(acc,cur.length);
 		},0);
   }
+	
+	static match (v1, v2) {
+		if(v1.length != v2.length) return false;
+		
+		for(let i = 0; i < v1.length; i++){
+			if(v1[i] != v2[i]) return false;
+		}
+		
+		return true;
+	}
   
   static add (...args) {
     const buffer = [];
